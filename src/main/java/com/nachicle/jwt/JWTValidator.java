@@ -1,35 +1,59 @@
+// TODO Finish javadocs.
 package com.nachicle.jwt;
 
-import com.nachicle.jwt.utils.EncryptionAlgorithm;
-import com.nachicle.jwt.utils.Encryptor;
+import com.nachicle.jwt.utils.HashAlgorithm;
+import com.nachicle.jwt.utils.Hasher;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+/**
+ * Exception thrown when an invalid token is found.
+ *
+ * @author Ignacio Blasco Muñoz
+ * @author https://www.nachicle.com
+ * @version 0.0.1
+ * @since 0.0.1
+ */
+
 @Getter
 @Setter
 public class JWTValidator {
 
-    String secret;
-    EncryptionAlgorithm algorithm;
+    private String secret;
+    private HashAlgorithm algorithm;
 
-    // Signature setters
-    public JWTValidator setAlgorithm(EncryptionAlgorithm alg){
+    /**
+     *
+      * @param alg
+     * @return
+     */
+    public JWTValidator setAlgorithm(HashAlgorithm alg) {
         algorithm = alg;
         return this;
     }
-    public JWTValidator setSecret(String scrt){
+
+    /**
+     *
+     * @param scrt
+     * @return
+     */
+    public JWTValidator setSecret(String scrt) {
         secret = scrt;
         return this;
     }
 
-    public Boolean validate (JWToken token) {
+    /**
+     *
+     * @param token
+     * @return
+     */
+    public Boolean validate(JWToken token) {
         try {
-            String hashedSignature = Encryptor.encrypt(token.getHeader() + "." + token.getPayload(), algorithm, secret);
+            String hashedSignature = Hasher.hash(token.getHeader() + "." + token.getPayload(), algorithm, secret);
             return token.getSignature().equals(hashedSignature);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            e.printStackTrace();
             return false;
         }
     }
